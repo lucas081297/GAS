@@ -1,0 +1,17 @@
+function get_last_email() {
+  const email = GmailApp.getInboxThreads();
+  const date = email[0].getMessages()[0].getDate();
+  const formatDate = `${date.getDay()}/${date.getMonth()+1}/${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}`;
+  const subject = email[0].getFirstMessageSubject();
+  Logger.log(subject+" "+formatDate);
+  send_email("lucas081297@hotmail.com","Monitoramento de Caixa de Emails",subject,formatDate);
+}
+
+function send_email(to,subject,sub,date){
+  MailApp.sendEmail({
+    to:to,
+    subject:subject,
+    htmlBody: "<p>Ultimo email: "+ sub +" - "+date+" <\p>"
+   
+  });
+}

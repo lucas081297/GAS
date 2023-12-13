@@ -1,0 +1,59 @@
+"https://developers.google.com/apps-script/reference/mail/mail-app";
+"https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app"
+
+
+function Estoque(){
+  var plan = SpreadsheetApp.getActiveSpreadsheet();
+  SpreadsheetApp.setActiveSheet(plan.getSheets()[1]);
+  var plan_ac=SpreadsheetApp.setActiveSheet(plan.getSheets()[1]);
+  var cont_list = 0;
+  var i=1;
+  while(plan.getRange("A"+i).getValue()!=0){
+    i++;
+  }
+  var final=i;
+  //var final = plan_ac.getLastRow();
+  var listm = [];
+  for(var i=2;i<final+1;i++){
+    var name_item= plan.getRange("A"+i).getValue();  
+    var item = plan.getRange("B"+i).getValue();  
+    var alerta = plan.getRange("C"+i).getValue();  
+    if(item<=alerta){
+      cont_list++;
+      listm[cont_list-1]="- "+name_item+"<p><\p>";
+    } else{
+      console.log("Tudo ok!")
+    }
+  }
+    cont_listcd=0;
+    var listcd = [];
+    for(var i=2;i<final+1;i++){
+    var name_itemcd= plan.getRange("A"+i).getValue();  
+    var itemcd = plan.getRange("D"+i).getValue();  
+    var alertacd = plan.getRange("E"+i).getValue();  
+    if(itemcd<=alertacd){
+      cont_listcd++;
+      listcd[cont_listcd-1]="- "+name_itemcd+"<p><\p>";
+    } else{
+      console.log("Tudo ok!")
+    }
+  }
+  listm.length=cont_list;
+  listcd.length=cont_listcd;
+  console.log("Itens em falta Matriz: "+listm);
+  console.log("Itens em falta CD: "+listcd);
+  listm=listm.join("");
+  listcd=listcd.join("");
+
+const date = new Date();
+const today = date.getDate();
+const currentMonth = date.getMonth() + 1; 
+  var email = "infraestrutura@aramisinc.com.br"
+  var subject = ["Estoque em falta "].toString();
+   MailApp.sendEmail({
+     to: email,
+     subject: subject + today+"/"+currentMonth,
+     htmlBody: "<b>Segue itens faltantes:<p><\p><font size='5'>MATRIZ:</b></font>"+"<p></p>"+listm+"<p></p><p></p>"+"<b><font size='5'>CD:</b></font>: <p></p></b>"+listcd,
+
+   });
+}

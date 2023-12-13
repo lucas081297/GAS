@@ -1,0 +1,20 @@
+function walk_drive(){
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[1];
+  var range = sheet.getRange("A2:C44");
+  var r=43,c=2;
+  var files = DriveApp.getFolderById("1YiaeyXSP5BOF5lZ84eWGksZzzy8Xazwp").getFiles();
+  while (files.hasNext()) {
+    var file = files.next();
+    var end=file.getUrl();
+    var num=file.getName().slice(0,3);
+    while(r>0){
+      var cell = range.getCell(r,1).getValue();
+      if(num==cell){
+        range.getCell(r,3).setValue(end);
+      }
+      r--;
+    }
+    r=43;
+  }
+}

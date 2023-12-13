@@ -1,0 +1,179 @@
+var plan = SpreadsheetApp.getActiveSpreadsheet();
+function close_sale() {
+  var ui = SpreadsheetApp.getUi();
+  var t = true;
+  SpreadsheetApp.setActiveSheet(plan.getSheets()[1]);
+  var troco = plan.getRange("I8").getValue();
+  var nome = plan.getRange("B4").getValue();
+  var grupo = plan.getRange("H3").getValue();
+  var pecas =[];
+  //let final;
+  let i=9;
+  while((plan.getRange("D"+i).getValue())!=""){
+    var peca = plan.getRange("D"+i).getValue();
+    pecas.push(peca);
+    i++;
+  }
+  if(hasDuplicates(pecas)&&grupo!="XEPA"){
+  var response = ui.alert('PEÇAS DO MESMO GRUPO!');
+  t = false;
+  }
+  else if((+troco)<0){
+  var response = ui.alert('PAGAMENTO MENOR QUE COMPRA!');
+  t = false;
+  }
+  else if((((+grupo)<1)||((+grupo)>3))&&(grupo!="XEPA")){
+    var response = ui.alert(grupo+'GRUPO NÃO PODE ESTAR VAZIO');
+    console.log(((+grupo)<1)||((+grupo)>3)||(grupo!="XEPA"))
+    t = false;
+  }
+  else if(nome==""){
+    var response = ui.alert ('NOME NÃO PODE ESTAR VAZIO');
+    t=false;
+  }
+  else{
+    
+  }
+  var total = plan.getRange("G8").getValue();
+  if(t){
+  copy_paste(nome,grupo,pecas,total);
+  delete_sale();
+  var response = ui.alert("VENDA FECHADA!");
+  go_to_plan(4)
+  SpreadsheetApp.getActiveSpreadsheet().getRange("C2").setValue(nome);
+  printTicket()
+  go_to_plan(1)
+  }
+}
+
+function copy_paste(nome,grupo,produtos,total){
+  var tam = produtos.length;
+  let final;
+  SpreadsheetApp.setActiveSheet(plan.getSheets()[2]);
+  let i=2;
+  while((plan.getRange("C"+i).getValue())!=""){
+    i++;
+  }
+  final = i;
+  console.log(final)
+  plan.getRange(`A${final}:A${(final+tam-1)}`).merge();
+  plan.getRange(`B${final}:B${(final+tam-1)}`).merge();
+  plan.getRange(`D${final}:D${(final+tam-1)}`).merge();
+  plan.getRange("A"+final).setValue(nome);
+  plan.getRange("B"+final).setValue(grupo);
+  plan.getRange("D"+final).setValue(total);
+  for(i=0;i<(tam+1);i++){
+    console.log(final)
+    produtos[i]
+    plan.getRange("C"+final).setValue(produtos[i]);
+    final++;
+  }
+}
+
+function copy_paste_t(nome,valor){
+  let final;
+  SpreadsheetApp.setActiveSheet(plan.getSheets()[5]);
+  let i=2;
+  while((plan.getRange("A"+i).getValue())!=""){
+    i++;
+  }
+  final = i;
+  console.log(final)
+  plan.getRange("A"+final).setValue(nome);
+  plan.getRange("B"+final).setValue(valor);
+}
+
+
+  var PRINT_OPTIONS = {
+    'size': "3.93701x2.3",               // paper size. 0=letter, 1=tabloid, 2=Legal, 3=statement, 4=executive, 5=folio, 6=A3, 7=A4, 8=A5, 9=B4, 10=B
+    'fzr': false,            // repeat row headers
+    'portrait': true,        // false=landscape
+    'fitw': true,            // fit window or actual size
+    'gridlines': false,      // show gridlines
+    'printtitle': false,
+    'sheetnames': false,
+    'pagenum': 'UNDEFINED',  // CENTER = show page numbers / UNDEFINED = do not show
+    'attachment': false,
+    'bottom_margin': 0,
+    'top_margin': 0.2,
+    'left_margin':0.2,
+    'right_margin':0
+  }
+
+  var PDF_OPTS = objectToQueryString(PRINT_OPTIONS);
+
+  function printSelectedRange() {
+    SpreadsheetApp.flush();
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getActiveSheet();
+    var range = sheet.getActiveRange();
+
+    var gid = sheet.getSheetId();
+    var printRange = objectToQueryString({
+      'c1': range.getColumn() - 1,
+      'r1': range.getRow() - 1,
+      'c2': range.getColumn() + range.getWidth() - 1,
+      'r2': range.getRow() + range.getHeight() - 1
+    });
+    var url = ss.getUrl().replace(/edit$/, '') + 'export?format=pdf' + PDF_OPTS + printRange + "&gid=" + gid;
+
+    var htmlTemplate = HtmlService.createTemplateFromFile('js');
+    htmlTemplate.url = url;
+    SpreadsheetApp.getUi().showModalDialog(htmlTemplate.evaluate().setHeight(10).setWidth(100), 'Gerando impressão');
+  }
+
+  function objectToQueryString(obj) {
+    return Object.keys(obj).map(function(key) {
+      return Utilities.formatString('&%s=%s', key, obj[key]);
+    }).join('');
+  }
+
+
+
+function delete_sale(){
+  SpreadsheetApp.setActiveSheet(plan.getSheets()[1]);
+  plan.getRange("B4").setValue("");
+  plan.getRange("H3").setValue("");
+  plan.getRange("H8").setValue("");
+  plan.getRange("B9:B1000").setValue("");
+}
+
+function go_to_plan(n){
+  SpreadsheetApp.setActiveSheet(plan.getSheets()[n]);
+}
+function go_to_plan0(){go_to_plan(0);}
+function go_to_plan1(){go_to_plan(1);}
+function go_to_plan2(){go_to_plan(2);}
+function go_to_plan3(){go_to_plan(3);}
+function go_to_plan4(){go_to_plan(4);}
+function go_to_plan5(){go_to_plan(5);}
+function go_to_plan6(){go_to_plan(6);}
+
+  function hasDuplicates(array) {
+    return (new Set(array)).size !== array.length;
+}
+
+  function onOpen() {
+    SpreadsheetApp.getUi().createMenu('Imprimir...').addItem('Imprimir', 'printSelectedRange').addToUi();
+  }
+
+  function printTicket(){
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getActiveSheet();
+    var range = sheet.getRange(1,1,5,6)
+    sheet.setActiveRange(range)
+    sheet.getSelection()
+    printSelectedRange()
+    nome = sheet.getRange("C3").getValue();
+    valor = sheet.getRange("C5").getValue();
+    copy_paste_t(nome,valor)
+  }
+
+  function printSack(){
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getActiveSheet();
+    var range = sheet.getRange(1,1,5,6)
+    sheet.setActiveRange(range)
+    sheet.getSelection()
+    printSelectedRange()
+  }

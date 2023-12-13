@@ -1,0 +1,39 @@
+function date_expiration() {
+  i=1;
+   var plan = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    while(plan.getRange("A"+i).getValue()!=0){
+    i++;
+  }
+  var final=i;
+  for(var i=2;i<final;i++){
+    var diff_days=plan.getRange("H"+i).getValue();
+    var fornecedor = plan.getRange("A"+i).getValue();
+    if(diff_days=="?"){
+
+    }
+    else{
+      if(diff_days<=60 && diff_days>30){
+        CalendarApp.getDefaultCalendar().createAllDayEvent("Expiração de Contrato - "+fornecedor+" em "+diff_days+" dias",
+        new Date(),{guests:"infraestrutura@aramisinc.com.br"}).setColor("2");
+      } else{
+      }
+      if(diff_days<=30 && diff_days>15){
+        CalendarApp.getDefaultCalendar().createAllDayEvent("Expiração de Contrato - "+fornecedor+" em "+diff_days+" dias",
+        new Date(),{guests:"infraestrutura@aramisinc.com.br"}).setColor("6");
+      } else{
+      }
+      if(diff_days<=15 && diff_days>5){
+        CalendarApp.getDefaultCalendar().createAllDayEvent("Expiração de Contrato - "+fornecedor+" em "+diff_days+" dias",
+        new Date(),{guests:"infraestrutura@aramisinc.com.br"}).setColor("5");
+      }
+      if(diff_days<=5 && diff_days>0){
+        CalendarApp.getDefaultCalendar().createAllDayEvent("Expiração de Contrato - "+fornecedor+" em "+diff_days+" dias",
+        new Date(),{guests:"infraestrutura@aramisinc.com.br"}).setColor("11");
+      }
+      if(diff_days<=0){
+        CalendarApp.getDefaultCalendar().createAllDayEvent(fornecedor+" EXPIRADO!!!",
+        new Date(),{guests:"infraestrutura@aramisinc.com.br"}).setColor("#4E5D6C");
+      }
+    }
+  }
+}
